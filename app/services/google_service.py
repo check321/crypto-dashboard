@@ -92,7 +92,8 @@ class GoogleService:
         """从Google搜索结果中提取价格信息"""
         try:
             soup = BeautifulSoup(html, 'html.parser')
-            
+            # log html
+            logger.info(f"HTML: {html}")
             # 尝试查找价格元素
             price_element = soup.find('div', {'class': 'BNeawe iBp4i AP7Wnd'})
             if not price_element:
