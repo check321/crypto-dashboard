@@ -1,0 +1,15 @@
+{
+  "configs": [
+    {
+      "id": 1,
+      "group": "default",
+      "power": 1.01,
+      "description": "Default multiplier"
+    },
+    {
+      "group": "premium",
+      "power": 1.01,
+      "id": 2
+    }
+  ]
+}

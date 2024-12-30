@@ -1,0 +1,58 @@
+my_fastapi_project/
+│
+├── app/                            # 主应用目录
+│   ├── __init__.py
+│   ├── main.py                    # FastAPI 应用入口
+│   ├── core/                      # 核心配置
+│   │   ├── __init__.py
+│   │   ├── config.py             # 配置管理
+│   │   ├── security.py           # 安全相关(认证、权限)
+│   │   └── logging.py            # 日志配置
+│   │
+│   ├── api/                       # API路由
+│   │   ├── __init__.py
+│   │   ├── v1/                   # API版本1
+│   │   │   ├── __init__.py
+│   │   │   ├── endpoints/        # API端点
+│   │   │   └── dependencies.py   # 依赖项
+│   │   └── deps.py              # 共享依赖
+│   │
+│   ├── models/                    # 数据库模型
+│   │   ├── __init__.py
+│   │   └── user.py
+│   │
+│   ├── schemas/                   # Pydantic模型
+│   │   ├── __init__.py
+│   │   └── user.py
+│   │
+│   ├── crud/                      # CRUD操作
+│   │   ├── __init__.py
+│   │   └── user.py
+│   │
+│   ├── services/                  # 业务逻辑
+│   │   ├── __init__.py
+│   │   └── user_service.py
+│   │
+│   └── utils/                     # 工具函数
+│       ├── __init__.py
+│       └── common.py
+│
+├── tests/                         # 测试目录
+│   ├── __init__.py
+│   ├── conftest.py               # pytest配置
+│   └── test_api/
+│
+├── alembic/                       # 数据库迁移
+│   ├── versions/
+│   └── env.py
+│
+├── logs/                          # 日志文件
+├── docs/                          # 项目文档
+├── scripts/                       # 部署脚本
+│
+├── .env                          # 环境变量
+├── .gitignore
+├── requirements.txt              # 依赖包
+├── alembic.ini                   # Alembic配置
+├── Dockerfile                    # Docker配置
+└── README.md 

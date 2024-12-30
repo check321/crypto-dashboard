@@ -1,0 +1,57 @@
+# Web框架
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+email-validator>=2.1.0
+
+# 数据库
+sqlalchemy>=2.0.23
+alembic>=1.12.1
+psycopg2-binary>=2.9.9  # PostgreSQL驱动
+asyncpg>=0.29.0  # 异步PostgreSQL驱动
+
+# 认证和安全
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-dotenv>=1.0.0
+
+# 数据验证
+pydantic>=2.4.2
+pydantic-settings>=2.0.3
+email-validator>=2.1.0
+
+# 工具包
+python-dateutil>=2.8.2
+pytz>=2023.3
+aiohttp>=3.9.1  # 异步HTTP客户端
+tenacity>=8.2.3  # 重试机制
+cachetools>=5.3.2  # 缓存工具
+aiofiles>=23.2.1  # 异步文件操作
+beautifulsoup4>=4.12.2  # HTML解析
+
+# 日志和监控
+prometheus-client>=0.19.0
+structlog>=23.2.0
+
+# 测试
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+httpx>=0.25.2
+pytest-cov>=4.1.0
+
+# 开发工具
+black>=23.11.0  # 代码格式化
+isort>=5.12.0   # import排序
+flake8>=6.1.0   # 代码检查
+mypy>=1.7.1     # 类型检查
+
+# 文档
+mkdocs>=1.5.3
+mkdocs-material>=9.4.14
+
+# 性能
+ujson>=5.8.0    # 快速JSON解析
+orjson>=3.9.10  # 更快的JSON解析
+
+# Binance SDK
+python-binance>=1.0.19

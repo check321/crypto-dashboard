@@ -1,0 +1,9 @@
+[tool.poetry]
+name = "my_fastapi_project"
+version = "0.1.0"
+description = "FastAPI Project Template"
+authors = ["Your Name <your.email@example.com>"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api" 
