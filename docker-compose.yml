@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  crypto-ticker:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: crypto-ticker
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./g-power.json:/app/g-power.json
+      - ./.env:/app/.env
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Tokyo  # 设置时区
+      - PYTHONPATH=/app/app
+    networks:
+      - crypto-network
+
+networks:
+  crypto-network:
+    driver: bridge 
