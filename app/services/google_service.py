@@ -1,12 +1,16 @@
 import aiohttp
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, timedelta
 from core.logging import logger
 import re
 from bs4 import BeautifulSoup
 from decimal import Decimal
 from core.config import settings
 import ssl
+import json
+import os
+from pathlib import Path
+import aiofiles
 
 class GoogleService:
     def __init__(self):
@@ -22,16 +26,64 @@ class GoogleService:
         self.ssl_context.verify_mode = ssl.CERT_NONE
         # 使用配置的代理
         self.proxy = settings.HTTPS_PROXY if settings.HTTPS_PROXY != "" else None
+        
+        # 缓存配置
+        self.cache_dir = Path("cache")
+        self.cache_file = self.cache_dir / "google_price_cache.json"
+        self.cache_expire_minutes = settings.GOOGLE_CACHE_EXPIRE_MINUTES
+        self._ensure_cache_dir()
+    
+    def _ensure_cache_dir(self):
+        """确保缓存目录存在"""
+        self.cache_dir.mkdir(exist_ok=True)
+        if not self.cache_file.exists():
+            self.cache_file.write_text("{}")
+    
+    async def _read_cache(self) -> dict:
+        """读取缓存数据"""
+        try:
+            async with aiofiles.open(self.cache_file, 'r') as f:
+                content = await f.read()
+                return json.loads(content)
+        except Exception as e:
+            logger.error(f"Failed to read cache: {str(e)}")
+            return {}
+    
+    async def _write_cache(self, cache_data: dict):
+        """写入缓存数据"""
+        try:
+            async with aiofiles.open(self.cache_file, 'w') as f:
+                await f.write(json.dumps(cache_data, indent=2))
+        except Exception as e:
+            logger.error(f"Failed to write cache: {str(e)}")
+    
+    def _is_cache_valid(self, cache_time: str) -> bool:
+        """检查缓存是否有效"""
+        try:
+            cache_datetime = datetime.fromisoformat(cache_time)
+            expire_time = cache_datetime + timedelta(minutes=self.cache_expire_minutes)
+            return datetime.now() < expire_time
+        except Exception:
+            return False
     
     async def get_price(self, symbol: str) -> dict:
         """
-        从Google搜索获取汇率信息
+        从Google搜索获取汇率信息，支持缓存
         """
         try:
             # 格式化搜索查询
             formatted_symbol = self._format_symbol(symbol)
-            query = f"{formatted_symbol} price"
             
+            # 检查缓存
+            cache_data = await self._read_cache()
+            if symbol in cache_data:
+                cache_entry = cache_data[symbol]
+                if self._is_cache_valid(cache_entry["timestamp"]):
+                    logger.info(f"Cache hit for symbol: {symbol}")
+                    return cache_entry
+            
+            # 如果缓存不存在或已过期，从Google获取数据
+            query = f"{formatted_symbol} price"
             logger.info(f"Searching Google for: {query}")
             logger.info(f"Using proxy: {self.proxy}")
             
@@ -53,7 +105,8 @@ class GoogleService:
                     html = await response.text()
                     price_info = self._extract_price(html, formatted_symbol)
                     
-                    return {
+                    # 构建响应数据
+                    result = {
                         "symbol": symbol,
                         "exchange": "Google",
                         "bid_price": price_info["price"],
@@ -66,6 +119,12 @@ class GoogleService:
                         "price_change_24h": 0,
                         "price_change_percent": 0
                     }
+                    
+                    # 更新缓存
+                    cache_data[symbol] = result
+                    await self._write_cache(cache_data)
+                    
+                    return result
                     
         except Exception as e:
             logger.error(f"Failed to fetch price from Google: {str(e)}")

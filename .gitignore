@@ -60,6 +60,11 @@ config.local.py
 *.local.py
 local_settings.py
 
+# 缓存文件
+cache/
+*.cache
+google_price_cache.json
+
 # 其他
 .env.local
 .env.*.local

@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     HTTP_PROXY: str = "http://127.0.0.1:7890"  # 根据你的代理设置调整
     HTTPS_PROXY: str = "http://127.0.0.1:7890"  # 根据你的代理设置调整
     
+    # Google服务配置
+    GOOGLE_CACHE_EXPIRE_MINUTES: int = 5  # Google价格缓存过期时间（分钟）
+    
     # 配置文件路径
     DATA_DIR: str = "data"
     POWER_CONFIG_FILE: str = "g-power.json"
