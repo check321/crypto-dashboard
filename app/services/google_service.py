@@ -78,9 +78,11 @@ class GoogleService:
             cache_data = await self._read_cache()
             if symbol in cache_data:
                 cache_entry = cache_data[symbol]
-                if self._is_cache_valid(cache_entry["timestamp"]):
-                    logger.info(f"Cache hit for symbol: {symbol}")
-                    return cache_entry
+                return cache_entry
+                # TODO: cache policy.
+                # if self._is_cache_valid(cache_entry["timestamp"]):
+                #     logger.info(f"Cache hit for symbol: {symbol}")
+                #     return cache_entry
             
             # 如果缓存不存在或已过期，从Google获取数据
             query = f"{formatted_symbol} price"
