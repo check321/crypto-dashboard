@@ -11,6 +11,7 @@ services:
     volumes:
       - ./g-power.json:/app/g-power.json
       - ./.env:/app/.env
+      - ./cache:/app/cache
     restart: unless-stopped
     environment:
       - TZ=Asia/Tokyo  # 设置时区

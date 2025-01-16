@@ -8,7 +8,6 @@ from decimal import Decimal
 from core.config import settings
 import ssl
 import json
-import os
 from pathlib import Path
 import aiofiles
 
@@ -78,11 +77,11 @@ class GoogleService:
             cache_data = await self._read_cache()
             if symbol in cache_data:
                 cache_entry = cache_data[symbol]
-                return cache_entry
+                # return cache_entry
                 # TODO: cache policy.
-                # if self._is_cache_valid(cache_entry["timestamp"]):
-                #     logger.info(f"Cache hit for symbol: {symbol}")
-                #     return cache_entry
+                if self._is_cache_valid(cache_entry["timestamp"]):
+                    logger.info(f"Cache hit for symbol: {symbol}")
+                    return cache_entry
             
             # 如果缓存不存在或已过期，从Google获取数据
             query = f"{formatted_symbol} price"
@@ -130,6 +129,12 @@ class GoogleService:
                     
         except Exception as e:
             logger.error(f"Failed to fetch price from Google: {str(e)}")
+            # 尝试返回缓存数据
+            cache_data = await self._read_cache()
+            if symbol in cache_data:
+                logger.info(f"Returning cached data for {symbol} due to error")
+                return cache_data[symbol]
+            # 如果没有缓存数据，则抛出异常
             raise HTTPException(
                 status_code=500,
                 detail=f"Failed to fetch price from Google: {str(e)}"

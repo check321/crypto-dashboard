@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     HTTPS_PROXY: str = "http://127.0.0.1:7890"  # 根据你的代理设置调整
     
     # Google服务配置
-    GOOGLE_CACHE_EXPIRE_MINUTES: int = 5  # Google价格缓存过期时间（分钟）
+    GOOGLE_CACHE_EXPIRE_MINUTES: int = 30  # Google价格缓存过期时间（分钟）
     
     # 配置文件路径
     DATA_DIR: str = "data"

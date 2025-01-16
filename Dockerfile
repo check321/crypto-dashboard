@@ -10,11 +10,11 @@ ENV PYTHONPATH=/app/app \
     PYTHONDONTWRITEBYTECODE=1
 
 # 安装系统依赖
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && \
+#     apt-get install -y --no-install-recommends \
+#     gcc \
+#     python3-dev \
+#     && rm -rf /var/lib/apt/lists/*
 
 # 创建必要的目录
 RUN mkdir -p /app/app
