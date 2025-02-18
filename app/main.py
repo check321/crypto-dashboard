@@ -4,6 +4,9 @@ from core.config import settings
 from api.v1.api import api_router
 import uvicorn
 from core.logging import logger
+import asyncio
+from api.v1.endpoints.crypto import get_compose_price_by_period
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -26,6 +29,28 @@ app.add_middleware(
 # 注册路由
 app.include_router(api_router)
 
+# 初始化定时任务调度器
+scheduler = AsyncIOScheduler()
+
+@app.on_event("startup")
+async def startup_event():
+    # 添加定时任务
+    scheduler.add_job(
+        get_compose_price_by_period,
+        'interval',
+        minutes=settings.PRICE_BROADCAST_INTERVAL,
+        id='price_broadcast'
+    )
+    # 启动调度器
+    scheduler.start()
+    logger.info(f"Started price broadcast scheduler with interval {settings.PRICE_BROADCAST_INTERVAL} seconds")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # 关闭调度器
+    scheduler.shutdown()
+    logger.info("Stopped price broadcast scheduler")
+
 # 健康检查
 @app.get("/health")
 async def health_check():
@@ -40,4 +65,4 @@ if __name__ == "__main__":
         port=7700,
         reload=True,
         workers=1,
-    ) 
+    )

@@ -29,7 +29,14 @@ class Settings(BaseSettings):
     DATA_DIR: str = "data"
     POWER_CONFIG_FILE: str = "g-power.json"
     
+    # Telegram配置
+    TG_BOT_TOKEN: str
+    TG_GID: str
+    
+    # 定时任务配置
+    PRICE_BROADCAST_INTERVAL: int = 5  # 价格广播间隔（分钟），默认5分钟
+    
     class Config:
         env_file = ".env"
 
-settings = Settings() 
+settings = Settings()

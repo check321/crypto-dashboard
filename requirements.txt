@@ -55,3 +55,10 @@ orjson>=3.9.10  # 更快的JSON解析
 
 # Binance SDK
 python-binance>=1.0.19
+
+# Telegram Bot
+python-telegram-bot
+telegramify-markdown
+
+# 定时任务
+apscheduler>=3.10.4

@@ -3,11 +3,20 @@ from services.binance_service import BinanceService
 from services.okx_service import OKXService
 from services.okj_service import OKJService
 from services.power_service import PowerService
-from typing import Optional, Literal
+from typing import Optional
 from enum import Enum
 from decimal import Decimal, ROUND_HALF_UP
 from core.logging import logger
 from services.google_service import GoogleService
+from core.config import settings
+import telegram
+import asyncio
+from telegram.constants import ParseMode
+from telegram.helpers import escape_markdown
+from datetime import datetime
+import textwrap
+import telegramify_markdown
+
 
 class Exchange(str, Enum):
     BINANCE = "binance"
@@ -16,6 +25,10 @@ class Exchange(str, Enum):
     GOOGLE = "google"
 
 router = APIRouter()
+
+tg_token = settings.TG_BOT_TOKEN
+gid = settings.TG_GID
+tg_bot = telegram.Bot(token=tg_token)
 
 @router.get("/price", summary="获取加密货币实时买卖价格")
 async def get_crypto_price(
@@ -161,3 +174,54 @@ async def get_compose_price(
             status_code=500,
             detail=f"Failed to calculate USDT/JPY rate: {str(e)}"
         ) 
+
+@router.get("/boardcast", summary="发送USDT/JPY组合计算价格")
+async def get_compose_price_by_period():
+    # 创建服务实例
+    binance_service = BinanceService()
+    okj_service = OKJService()
+    google_service = GoogleService()
+    power_service = PowerService()
+    
+    # 调用get_compose_price函数并打印结果
+    res = await get_compose_price(
+        group=None,
+        binance_service=binance_service,
+        okj_service=okj_service,
+        google_service=google_service,
+        power_service=power_service
+    )
+    
+    bid_price = res['usdt_jpy']['bid_price']
+    ask_price = res['usdt_jpy']['ask_price']
+    last_price = res['usdt_jpy']['last_price']
+    google_last_price = res['usdt_jpy_google']['last_price']
+    time_raw = res['calculation_time']
+    formatted_time = datetime.fromisoformat(time_raw.replace('Z', '+00:00')).strftime('%Y-%m-%d %H:%M:%S')
+    
+    template = f"""
+## 💲USDT/JPY 实时价格
+⬆️**买入价格**：{bid_price}
+⬇️**卖出价格**：{ask_price}
+🤝**最新成交价格**：{last_price}
+
+## 💴Google USDT/JPY 实时价格
+🤝**最新成交价格**： {google_last_price}
+
+## ⏰数据更新时间：
+{formatted_time}
+    """
+    markdown_text = textwrap.dedent(template)
+    formatted_content = telegramify_markdown.markdownify(markdown_text)
+    
+    await tg_bot.send_message(
+        chat_id=gid,
+        text=formatted_content,
+        parse_mode=ParseMode.MARKDOWN_V2
+    )
+    
+    
+    return res
+
+    
+    
