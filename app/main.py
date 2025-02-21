@@ -32,7 +32,7 @@ app.include_router(api_router)
 # 初始化定时任务调度器
 scheduler = AsyncIOScheduler()
 
-@app.on_event("startup")
+# @app.on_event("startup")
 async def startup_event():
     # 添加定时任务
     scheduler.add_job(
@@ -43,9 +43,9 @@ async def startup_event():
     )
     # 启动调度器
     scheduler.start()
-    logger.info(f"Started price broadcast scheduler with interval {settings.PRICE_BROADCAST_INTERVAL} seconds")
+    logger.info(f"Started price broadcast scheduler with interval {settings.PRICE_BROADCAST_INTERVAL} min(s)")
 
-@app.on_event("shutdown")
+# @app.on_event("shutdown")
 async def shutdown_event():
     # 关闭调度器
     scheduler.shutdown()

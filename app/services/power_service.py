@@ -6,6 +6,7 @@ from typing import List
 import aiofiles
 from core.logging import logger
 from pathlib import Path
+import random,string
 
 class PowerService:
     def __init__(self):
@@ -64,6 +65,18 @@ class PowerService:
             detail=f"Configuration not found for group: {group}"
         )
     
+    async def get_config_by_id(self, id: str) -> PowerConfig:
+        """根据id获取配置"""
+        configs = await self.get_all_configs()
+        for config in configs:
+            if config.id == id:
+                return config
+        raise HTTPException(
+            status_code=404,
+            detail=f"Configuration not found for id: {id}"
+        )
+        
+    
     async def create_config(self, config: PowerConfig) -> PowerConfig:
         """创建新配置"""
         data = await self._read_config()
@@ -76,8 +89,9 @@ class PowerService:
                 detail=f"Configuration already exists for group: {config.group}"
             )
         
-        # 生成新ID
-        new_id = max([c.get("id", 0) for c in configs], default=0) + 1
+        # new_id = max([c.get("id", 0) for c in configs], default=0) + 1
+        # crate a 6-character random ID made up of both number and letters.
+        new_id = self._generate_random_id()
         config_dict = config.dict()
         config_dict["id"] = new_id
         
@@ -86,6 +100,10 @@ class PowerService:
         await self._write_config(data)
         
         return PowerConfig(**config_dict)
+    
+    def _generate_random_id(self) -> str:
+        characters = string.ascii_letters + string.digits
+        return ''.join(random.choices(characters,k=6))
     
     async def update_config(self, group: str, config: PowerConfig) -> PowerConfig:
         """更新配置"""

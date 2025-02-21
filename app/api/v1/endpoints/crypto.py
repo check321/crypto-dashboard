@@ -67,6 +67,7 @@ async def get_crypto_price(
 @router.get("/compose", summary="获取USDT/JPY组合计算价格")
 async def get_compose_price(
     group: Optional[str] = Query(None, description="价格倍率分组"),
+    id: Optional[str] = Query(None,description="价格倍率分组Id" ),
     binance_service: BinanceService = Depends(BinanceService),
     okj_service: OKJService = Depends(OKJService),
     google_service: GoogleService = Depends(GoogleService),
@@ -91,6 +92,16 @@ async def get_compose_price(
                     logger.warning(f"Power config not found for group {group}, using default power 1.0")
                 else:
                     raise
+        elif id:
+            try:
+                power_config = await power_service.get_config_by_id(id)
+                power = Decimal(str(power_config.power))
+                logger.info(f"Using power multiplier {power} for id {id}")
+            except HTTPException as e:
+                if e.status_code == 404:
+                    logger.warning(f"Power config not found for group id {id}, using default power 1.0")
+                else:
+                    raise        
         
         # 并行获取所有价格数据
         btc_usdt_data = await binance_service.get_price("BTCUSDT")
