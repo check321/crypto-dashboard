@@ -1,0 +1,6 @@
+{
+    "price_broadcast": {
+        "title": "价格广播模板",
+        "content": "## 💲USDT/JPY 实时价格\n⬆️**买入价格**：{bid_price}\n⬇️**卖出价格**：{ask_price}\n🤝**最新成交价格**：{last_price}\n\n## 💴Google USDT/JPY 实时价格\n🤝**最新成交价格**： {google_last_price}\n\n## ⌚️数据更新时间：\n{formatted_time}"
+    }
+}

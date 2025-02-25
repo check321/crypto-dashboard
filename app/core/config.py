@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import secrets
+import json
+import os
+from pathlib import Path
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI Project"
@@ -34,8 +37,30 @@ class Settings(BaseSettings):
     TG_GID: str
     
     # 定时任务配置
-    PRICE_BROADCAST_INTERVAL: int = 5  # 价格广播间隔（分钟），默认5分钟
+    @property
+    def PRICE_BROADCAST_INTERVAL(self) -> int:
+        config_file = Path(__file__).parent / "scheduler_config.json"
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return config.get("price_broadcast_interval", 5)
+        except Exception:
+            return 5  # 默认值
     
+    @PRICE_BROADCAST_INTERVAL.setter
+    def PRICE_BROADCAST_INTERVAL(self, minutes: int) -> None:
+        config_file = Path(__file__).parent / "scheduler_config.json"
+        try:
+            config = {}
+            if config_file.exists():
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+            config["price_broadcast_interval"] = minutes
+            with open(config_file, 'w') as f:
+                json.dump(config, f, indent=2)
+        except Exception as e:
+            raise ValueError(f"Failed to update broadcast interval: {str(e)}")
+
     class Config:
         env_file = ".env"
 

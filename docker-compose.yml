@@ -12,6 +12,8 @@ services:
       - ./g-power.json:/app/g-power.json
       - ./.env:/app/.env
       - ./cache:/app/cache
+      - ./message_template.json:/app/templates/message_template.json
+      - ./scheduler_config.json:/app/core/scheduler_config.json
     restart: unless-stopped
     environment:
       - TZ=Asia/Tokyo  # 设置时区
